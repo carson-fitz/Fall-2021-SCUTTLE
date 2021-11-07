@@ -1,28 +1,3 @@
-# Fall-2021-SCUTTLE
-Obstacle avoidance SCUTTLE, Fall 2021
-somethi
-something again
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Fall 2021 SCUTTLE
+Obstacle avoidance SCUTTLE using Jetson Nano and stereoscopic camera.
+MXET 300-504, Team 10
