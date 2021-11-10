@@ -1,4 +1,4 @@
-# Motors program for SCUTTLE running Jetson Nano
+# Motors program for SCUTTLE running Jetson Nano, modified from RPi SCUTTLE
 # Jetson Nano only has 2 PWM capable pins excluding the CPU fan, 
 # so we use I2C to control an external PWM device (PCA9685)
 # Code runs, but has not been tested on hardware
