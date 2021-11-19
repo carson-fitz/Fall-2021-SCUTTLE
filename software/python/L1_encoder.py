@@ -2,23 +2,23 @@
 # Modified from RPi-SCUTTLE L1_encoder script - Carson F
 
 # Import external libraries
-import smbus2               # a Python package to communicate over i2c
+import L1_i2c as i2c
 import numpy as np          # use numpy to build the angles array
 import time                 # for keeping time
 
-bus = smbus2.SMBus(1)      # declare the i2c bus object
-
 encL = 0x40         # encoder i2c address for LEFT motor
-#encR = 0x41         # encoder i2c address for RIGHT motor (this encoder has A1 pin pulled high)
+encR = 0x41         # encoder i2c address for RIGHT motor (this encoder has A1 pin pulled high)
 
 def singleReading(encoderSelection):                                            # return a reading for an encoder in degrees (motor shaft angle)
     try:
-        twoByteReading = bus.read_i2c_block_data(encoderSelection, 0xFE, 2)     # request data from registers 0xFE & 0xFF of the encoder. Approx 700 microseconds.
+        twoByteReading = i2c.get_i2c().read_i2c_block_data(encoderSelection, 0xFE, 2)     # request data from registers 0xFE & 0xFF of the encoder. Approx 700 microseconds.
         binaryPosition = (twoByteReading[0] << 6) | twoByteReading[1]           # remove unused bits 6 & 7 from byte 0xFF creating 14 bit value
         degreesPosition = binaryPosition*(360/2**14)                            # convert to degrees
         degreesAngle = round(degreesPosition,1)                                 # round to nearest 0.1 degrees
-    except:
-        print("Encoder reading failed.")                                        # indicate a failed reading
+        print(twoByteReading)
+    except Exception as e:
+        print("Encoder reading failed.")  
+        print(e)                                      # indicate a failed reading
         degreesAngle = 0
     return degreesAngle
 
@@ -32,7 +32,9 @@ def readShaftPositions():                                   # read both motor sh
         print(e)                                            # print exception
         angle0 = 0
     try:
-        angle1 = 0                        
+        rawAngle = singleReading(encR)                      # capture left motor shaft
+        angle1 = 360.0 - rawAngle                           # invert the reading for left side only
+        angle1 = round(angle1,1)                          
     except:
         print('Warning(I2C): Could not read right encoder') # indicate which reading failed
         angle1 = 0
