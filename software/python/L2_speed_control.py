@@ -69,6 +69,51 @@ def driveClosedLoop(pdt, pdc, de_dt):               # this function runs motors 
     u[1] = sorted([-1, u[1], 1])[1]                                 # within [-1, 1]
 
     # SEND SIGNAL TO MOTORS
-    m.MotorL(round(u[0], 2))                                        # must round to ensure driver handling!
-    m.MotorR(round(u[1], 2))                                        # must round to ensure driver handling!
+    m.sendLeft(round(u[0], 2))                                        # must round to ensure driver handling!
+    m.sendRight(round(u[1], 2))                                        # must round to ensure driver handling!
     return
+
+if __name__ == "__main__":
+    # IMPORT EXTERNAL ITEMS
+    from timeit import default_timer as timer
+    from time import sleep
+
+    # IMPORT INTERNAL ITEMS
+    import L2_speed_control as sc # closed loop control. Import speed_control for open-loop
+    import L2_inverse_kinematics as inv #calculates wheel parameters from chassis
+    import L2_vector as vec    # calculates chassis parameters from wheels
+
+    # CREATE A FUNCTION FOR DRIVING
+    def loop_drive():
+        # INITIALIZE VARIABLES FOR CONTROL SYSTEM
+        t0 = 0  # time sample
+        t1 = 1  # time sample
+        e00 = 0 # error sample
+        e0 = 0  # error sample
+        e1 = 0  # error sample
+        dt = 0  # delta in time
+        de_dt = np.zeros(2) # initialize the de_dt
+        global_vel = 0      # this gets set by the path planner
+        heading = 0         # heading comes from compass
+        
+        while(1):
+            # THIS CODE IS FOR OPEN AND CLOSED LOOP control
+            pdTargets = inv.convert(vec.cart2polar(global_vel, heading)) # Input requested PhiDots (radians/s)
+            pdCurrents = inv.convert(vec.cart2polar(global_vel, heading)) # parameters will come from path planner
+            '''
+            # THIS BLOCK UPDATES VARIABLES FOR THE DERIVATIVE CONTROL
+            t0 = t1  # assign t0
+            t1 = timer() # generate current time
+            dt = t1 - t0 # calculate dt
+            e00 = e0 # assign previous previous error
+            e0 = e1  # assign previous error
+            e1 = pdCurrents - pdTargets # calculate the latest error
+            de_dt = (e1 - e0) / dt # calculate derivative of error
+            ''' 
+            de_dt = 0 # for now, no derivative control
+
+            # CALLS THE CONTROL SYSTEM TO ACTION
+            sc.driveClosedLoop(pdTargets, pdCurrents, de_dt)  # call on closed loop
+            sleep(0.05) # this time controls the frequency of the controller
+                
+    loop_drive() # call the function    

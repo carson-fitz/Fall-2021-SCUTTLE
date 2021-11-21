@@ -1,29 +1,23 @@
 # Motors program for SCUTTLE running Jetson Nano, modified from RPi SCUTTLE
-# Jetson Nano only has 2 PWM capable pins excluding the CPU fan, 
-# so we use I2C to control an external PWM device (PCA9685)
-# Code runs, but has not been tested on hardware
-# Last update: Nov 10 2021 modified for Jetson Nano w/ PCA9685 - Carson F
+# Last update: Nov 20 2021 clean up after testing - Carson F
 
 import time             # Time keeping
 import numpy as np      # Numpy for easy arrays
-#import busio            # Provides I2C interface
 
-#from board import SCL, SDA              # Import this board's I2C pin config
 from L0_pca9685 import PCA9685           # Import PWM controller
-import L1_i2c as i2c
+import L0_i2c as i2c
+
+# Motor constants
+l_channel =  np.array([0, 1])         # Channels 0 and 1 control left motor
+r_channel = np.array([2, 3])         # Channels 2 and 3 control right motor
 
 # Configure I2C
-# Q: L1_encoder uses I2C, but w/ smbus2. This uses busio, may be a problem since both need
-#    to run together and use I2C. May need an L1_I2C to ensure I'm not duplicating I2C
-#    -Carson
 freq = 150
-#i2c_bus = busio.I2C(SCL, SDA)
-i2c_bus = i2c.get_i2c()
 
 # Configure PCA9685
-pca = PCA9685(i2c=i2c_bus)
-pca.set_pwm_freq(1000)
-pca.set_all_pwm(0, 1)
+pca = PCA9685(i2c=i2c.get_i2c())
+pca.set_pwm_freq(freq)
+pca.set_all_pwm(0, 1)               # set all PWM to minimum duty cycle
 
 def computePWM(speed):              # take an argument in range [-1,1]
     if speed == 0:
@@ -35,15 +29,15 @@ def computePWM(speed):              # take an argument in range [-1,1]
         x = np.array([int(chA), int(chB)])     # store values to an array
     return(x)
 
-def sendLeft(mySpeed):          # takes about 1 ms, slower than usual due to i2c control
+def sendLeft(mySpeed):          # takes about 1 ms, slower than before due to i2c control
     myPWM = computePWM(mySpeed)
-    pca.set_pwm(0, 0, myPWM[0])
-    pca.set_pwm(1, 0, myPWM[1])
+    pca.set_pwm(l_channel[0], 0, myPWM[0])
+    pca.set_pwm(l_channel[1], 0, myPWM[1])
 
-def sendRight(mySpeed):         # takes about 1 ms
+def sendRight(mySpeed):         
     myPWM = computePWM(mySpeed)
-    pca.set_pwm(2, 0, myPWM[0])
-    pca.set_pwm(3, 0, myPWM[1])
+    pca.set_pwm(r_channel[0], 0, myPWM[0])
+    pca.set_pwm(r_channel[1], 0, myPWM[1])
 
 # THIS LOOP ONLY RUNS IF THE PROGRAM IS CALLED DIRECTLY
 if __name__ == "__main__":
@@ -59,11 +53,11 @@ if __name__ == "__main__":
             time.sleep(4)                       # run reverse for 4 seconds
             sendLeft(0.8)
             sendRight(-0.8)
-            time.sleep(4)  
+            time.sleep(4)                       # turn for 4 seconds
             print("stopping motors 4 seconds")
             sendLeft(0)
             sendRight(0)
-            time.sleep(4)
-    except KeyboardInterrupt:
+            time.sleep(4)                       # stop for 4 seconds
+    except KeyboardInterrupt:                   # stop motors for keyboard interrupt
         sendLeft(0)
         sendRight(0)

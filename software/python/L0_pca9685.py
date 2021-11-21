@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 # Modified Nov 11 2021
-# Changed to be compatible with SMBus2 - Carson F
+# Changed to use SMBus2 - Carson F
 
 from __future__ import division
 import logging
@@ -54,14 +54,6 @@ OUTDRV             = 0x04
 
 
 logger = logging.getLogger(__name__)
-
-# Reset is useful, but SMBus2 does not allow raw writes to I2C so we can't do it this way
-#def software_reset(address, i2c, **kwargs):
-#    """Sends a software reset (SWRST) command to all servo drivers on the bus."""
-#    # Setup I2C interface for device 0x00 to talk to all of them.
-#    self._device = i2c
-#    self._device.write_byte_data(0x06)  # SWRST
-
 
 class PCA9685():
     """PCA9685 PWM LED/servo controller."""

@@ -1,8 +1,8 @@
 # This code runs on SCUTTLE with Jetson Nano setup
 # Modified from RPi-SCUTTLE L1_encoder script - Carson F
 
-# Import external libraries
-import L1_i2c as i2c
+# Import libraries
+import L0_i2c as i2c        # i2c bus shared by several scripts
 import numpy as np          # use numpy to build the angles array
 import time                 # for keeping time
 
@@ -16,9 +16,8 @@ def singleReading(encoderSelection):                                            
         degreesPosition = binaryPosition*(360/2**14)                            # convert to degrees
         degreesAngle = round(degreesPosition,1)                                 # round to nearest 0.1 degrees
         print(twoByteReading)
-    except Exception as e:
+    except:
         print("Encoder reading failed.")  
-        print(e)                                      # indicate a failed reading
         degreesAngle = 0
     return degreesAngle
 
@@ -27,9 +26,8 @@ def readShaftPositions():                                   # read both motor sh
         rawAngle = singleReading(encL)                      # capture left motor shaft
         angle0 = 360.0 - rawAngle                           # invert the reading for left side only
         angle0 = round(angle0,1)                            # repeat rounding due to math effects
-    except Exception as e:
+    except:
         print('Warning(I2C): Could not read left encoder')  # indicate which reading failed
-        print(e)                                            # print exception
         angle0 = 0
     try:
         rawAngle = singleReading(encR)                      # capture left motor shaft

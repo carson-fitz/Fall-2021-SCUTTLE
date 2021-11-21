@@ -8,5 +8,5 @@ i2c_bus = smbus2.SMBus(0)
 def get_i2c():                           # Returns the i2c_bus
     return i2c_bus
 
-def close():
+def close():                             # Closes i2c_bus
     i2c_bus.close()
