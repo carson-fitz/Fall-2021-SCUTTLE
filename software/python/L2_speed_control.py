@@ -63,15 +63,15 @@ def driveClosedLoop(pdt, pdc, de_dt):               # this function runs motors 
     u_derivative = (de_dt * kd)                                     # derivative term takes de_dt as an argument
 
     # CONDITION THE SIGNAL BEFORE SENDING TO MOTORS
-    u = np.round((u_proportional + u_integral + u_derivative), 2)   # must round to ensure driver handling
+    u = np.round((u_proportional + u_integral + u_derivative), 4)   # changed from 2 to 4, 12 bit precision on pwm driver
     u = scaleMotorEffort(u)                                         # perform scaling - described above
     u[0] = sorted([-1, u[0], 1])[1]                                 # place bounds on the motor commands
     u[1] = sorted([-1, u[1], 1])[1]                                 # within [-1, 1]
 
     # SEND SIGNAL TO MOTORS
-    m.sendLeft(round(u[0], 2))                                        # must round to ensure driver handling!
-    m.sendRight(round(u[1], 2))                                        # must round to ensure driver handling!
-    return
+    m.sendLeft(u[0])                                        
+    m.sendRight(u[1])                                        # no longer rounded to 2, already got rounded anyway
+    
 
 if __name__ == "__main__":
     # IMPORT EXTERNAL ITEMS
@@ -79,9 +79,10 @@ if __name__ == "__main__":
     from time import sleep
 
     # IMPORT INTERNAL ITEMS
-    import L2_speed_control as sc # closed loop control. Import speed_control for open-loop
-    import L2_inverse_kinematics as inv #calculates wheel parameters from chassis
-    import L2_vector as vec    # calculates chassis parameters from wheels
+    import L2_speed_control as sc # closed loop control
+    import L2_inverse_kinematics as inv # calculates wheel parameters from chassis
+    import L2_kinematics as kin # gets phi dots
+    import L2_vector as vec    # calculates chassis speeds from planned velocities
 
     # CREATE A FUNCTION FOR DRIVING
     def loop_drive():
@@ -98,8 +99,8 @@ if __name__ == "__main__":
         
         while(1):
             # THIS CODE IS FOR OPEN AND CLOSED LOOP control
-            pdTargets = inv.convert(vec.cart2polar(global_vel, heading)) # Input requested PhiDots (radians/s)
-            pdCurrents = inv.convert(vec.cart2polar(global_vel, heading)) # parameters will come from path planner
+            pdTargets = inv.convert(vec.cart2polar(global_vel, heading)) # parameters will come from path planner
+            pdCurrents =  kin.getPdCurrent # current wheel speeds from kinematics
             '''
             # THIS BLOCK UPDATES VARIABLES FOR THE DERIVATIVE CONTROL
             t0 = t1  # assign t0

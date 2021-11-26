@@ -17,7 +17,11 @@ def polar2cart(r, alpha):                           # convert an individual vect
     cart = np.round(np.array([x, y]), 3)            # vectorize and round
     return cart
 
-def cart2polar(vec, theta, t=0.05):          # takes local velocity ([xd,yd]), current heading, and timestep; returns polar velocity [rd,td]
+# vec is the target velocity vector, theta is the current heading angle, t is the time elapsed between the current velocity and new velocity
+# needs to work this way since chassis speed is [speed: m/s, angular vel: rad/s] and cartesian velocity is just a single vector,
+# target chassis speed can be calculated from current and target velocities over time, t should come from path planner time step
+# - Carson 
+def cart2polar(vec, theta, t=0.5):          # takes local velocity ([xd,yd]), current heading, and timestep; returns polar velocity [rd,td]
     d_theta = np.atan2(vec[1], vec[0]) - theta
     numer = np.abs(d_theta) * np.sqrt((vec[0])**2 + (vec[1])**2)
     denom = 2*np.sin(np.abs(d_theta)/2)
