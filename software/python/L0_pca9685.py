@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 # Modified Nov 22 2021
-# Address changed to 0x42 to avoid conflict w/ encoders - Carson F
+# Address changed to 0x43 to avoid conflict w/ encoders - Carson F
 
 from __future__ import division
 import logging
@@ -29,7 +29,7 @@ import math
 
 
 # Registers/etc:
-PCA9685_ADDRESS    = 0x42
+PCA9685_ADDRESS    = 0x43
 MODE1              = 0x00
 MODE2              = 0x01
 SUBADR1            = 0x02

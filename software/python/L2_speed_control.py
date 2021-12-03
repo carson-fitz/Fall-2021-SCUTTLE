@@ -79,6 +79,7 @@ if __name__ == "__main__":
     from time import sleep
 
     # IMPORT INTERNAL ITEMS
+    import objectdetection # zed object detection, posts IMU data to global variables
     import L2_speed_control as sc # closed loop control
     import L2_inverse_kinematics as inv # calculates wheel parameters from chassis
     import L2_kinematics as kin # gets phi dots
@@ -87,30 +88,16 @@ if __name__ == "__main__":
     # CREATE A FUNCTION FOR DRIVING
     def loop_drive():
         # INITIALIZE VARIABLES FOR CONTROL SYSTEM
-        t0 = 0  # time sample
-        t1 = 1  # time sample
-        e00 = 0 # error sample
-        e0 = 0  # error sample
-        e1 = 0  # error sample
-        dt = 0  # delta in time
         de_dt = np.zeros(2) # initialize the de_dt
-        global_vel = 0      # this gets set by the path planner
-        heading = 0         # heading comes from compass
         
         while(1):
             # THIS CODE IS FOR OPEN AND CLOSED LOOP control
-            pdTargets = inv.convert(vec.cart2polar(global_vel, heading)) # parameters will come from path planner
+            # parameters will come from path planner as globals
+            # difference between target and current is global displacement, for now current can just be the previous waypoint but
+            # later it needs to be set by IMU's pose estimation or some other localization method
+            pdTargets = inv.convert(vec.cart2polar(global_target - global_current, global_heading))
             pdCurrents =  kin.getPdCurrent # current wheel speeds from kinematics
-            '''
-            # THIS BLOCK UPDATES VARIABLES FOR THE DERIVATIVE CONTROL
-            t0 = t1  # assign t0
-            t1 = timer() # generate current time
-            dt = t1 - t0 # calculate dt
-            e00 = e0 # assign previous previous error
-            e0 = e1  # assign previous error
-            e1 = pdCurrents - pdTargets # calculate the latest error
-            de_dt = (e1 - e0) / dt # calculate derivative of error
-            ''' 
+
             de_dt = 0 # for now, no derivative control
 
             # CALLS THE CONTROL SYSTEM TO ACTION
@@ -118,3 +105,4 @@ if __name__ == "__main__":
             sleep(0.05) # this time controls the frequency of the controller
                 
     loop_drive() # call the function    
+    

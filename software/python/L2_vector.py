@@ -17,18 +17,19 @@ def polar2cart(r, alpha):                           # convert an individual vect
     cart = np.round(np.array([x, y]), 3)            # vectorize and round
     return cart
 
-# vec is the target velocity vector, theta is the current heading angle, t is the time elapsed between the current velocity and new velocity
-# needs to work this way since chassis speed is [speed: m/s, angular vel: rad/s] and cartesian velocity is just a single vector,
-# target chassis speed can be calculated from current and target velocities over time, t should come from path planner time step
-# - Carson 
-def cart2polar(vec, theta, t=0.5):          # takes local velocity ([xd,yd]), current heading, and timestep; returns polar velocity [rd,td]
-    d_theta = np.atan2(vec[1], vec[0]) - theta
-    numer = np.abs(d_theta) * np.sqrt((vec[0])**2 + (vec[1])**2)
-    denom = 2*np.sin(np.abs(d_theta)/2)
-    rd = numer/denom
+def cart2polar_matrix(vel_target, heading):    # attempt to implement cart2polar using linear algebra, very likely does not work it's just for reference
+    A = np.array([np.cos(heading), np.sin(heading), 0], 
+                 [0,               0,               1])
+    B = np.append(vel_target, heading)
+    x = np.linalg.lstsq(A, B)
+    return x
+
+def cart2polar(target, heading, t=0.5):
+    d_theta = np.atan2(target[1], target[0]) - heading
     td = d_theta/t
-    polar = np.round(np.array([rd, td]), 3)
-    return polar
+    rd = (td*np.sqrt(target[1]**2 + target[0]**2))/(2*np.sin(np.abs(d_theta)/2))
+    return np.round(np.array([rd, td]), 3) 
+
 
 def rotate(vec, theta):                             # describe a vector in global coordinates by rotating from body-fixed frame
     c, s = np.cos(theta), np.sin(theta)             # define cosines & sines
