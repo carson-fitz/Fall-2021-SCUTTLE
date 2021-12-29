@@ -1,0 +1,30 @@
+            #empt1.append(obst[0])
+            #empt2.append(obst[1])
+            #empt3.append(obst[2])
+            #empt4.append(obst[3])         
+    
+    #arrtolist1 = np.array(empt1).tolist()
+    #newlist1 = sum(arrtolist1, [])
+    #arrtolist2 = np.array(empt2).tolist()
+    #newlist2 = sum(arrtolist2, [])
+    #arrtolist3 = np.array(empt3).tolist()
+    #newlist3 = sum(arrtolist3, [])
+    #arrtolist4 = np.array(empt4).tolist()
+    #newlist4 = sum(arrtolist4, [])
+    #returnedlist = [newlist1] + [newlist2] + [newlist3] + [newlist4]
+    #arrayreturn = np.array(returnedlist)
+    #print(arrayreturn)
+    #ob.plotrobotandobstacles(arrayreturn, 0.25, 40, 20)
+    #function call to write to create obj in algorithm
+
+
+
+    *************************** creating IMU data w/ magnetometer
+                #***** imu 
+            #quaternion = sensors_data.get_imu_data().get_pose().get_orientation().get()
+            #print(" \t Orientation: [ Ox: {0}, Oy: {1}, Oz {2}, Ow: {3} ]".format(quaternion[0], quaternion[1], quaternion[2], quaternion[3]))
+            #magnetic_field_calibrated = sensors_data.get_magnetometer_data().get_magnetic_field_calibrated()
+            #print(" - Magnetometer\n \t Magnetic Field: [ {0} {1} {2} ] [uT]".format(magnetic_field_calibrated[0], magnetic_field_calibrated[1], magnetic_field_calibrated[2]))
+            ##heading = 90 - math.atan(magnetic_field_calibrated[2]/magnetic_field_calibrated[0])*180/math.pi
+            #print("heading:", heading)
+            # ***** imu end

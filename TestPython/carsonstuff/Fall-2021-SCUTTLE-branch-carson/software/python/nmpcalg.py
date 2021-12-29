@@ -9,11 +9,11 @@ from scipy.optimize import minimize, Bounds
 import time
 
 SIM_TIME = 10.  #total simulation time in (s)
-TIMESTEP = 0.5  #time steps per calculation (Higher Value == larger steps between calculation) orig = 0.1(s) 
+TIMESTEP = 0.2  #time steps per calculation (Higher Value == larger steps between calculation) orig = 0.1(s) 
 NUMBER_OF_TIMESTEPS = int(SIM_TIME/TIMESTEP)  
-ROBOT_RADIUS = 0.5   #relative radius of the robot
-VMAX = 2   #max velocity of robot
-VMIN = 0.2 #min velocity of robot
+ROBOT_RADIUS = 0.3   #relative radius of the robot
+VMAX = 0.4   #max velocity of robot
+VMIN = 0.05 #min velocity of robot
 
 # collision cost parameters
 Qc = 5.
@@ -43,9 +43,9 @@ def simulate(myobstacles,robot_state, p_desired, robot_state_history):
                                                           #cost function will chose the most optimal
     # compute velocity using nmpc (uses previous position-prediciton) and cost function
     vel, velocity_profile = compute_velocity(robot_state, obstacle_predictions, xref) #computes [Vx,Vy] of My robot based on optimal cost
-    print('VelRobot:', vel)
+    #print('VelRobot:', vel)
     robot_state = update_state(robot_state, vel, TIMESTEP) #returns actual position of the robot after (Vel) applied 
-    print('RobotNewPos:', robot_state)
+    #print('RobotNewPos:', robot_state)
     robot_state_history = robot_state
 
     #ob.plotrobotandobstacles(
@@ -114,14 +114,14 @@ def collision_cost(x0, x1):
 
 def predict_obstacle_positions(obstacles):
     obstacle_predictions = []
-    print("raw", obstacles)
+    #print("raw", obstacles)
     for i in range(np.shape(obstacles)[1]):
         obstacle = obstacles[:, i]
         obstacle_position = obstacle[:2]
         obstacle_vel = obstacle[2:]
         u = np.vstack([np.eye(2)] * HORIZON_LENGTH) @ obstacle_vel
         obstacle_prediction = update_state(obstacle_position, u, NMPC_TIMESTEP)
-        print("obst prediction:", obstacle_prediction)
+        #print("obst prediction:", obstacle_prediction)
         obstacle_predictions.append(obstacle_prediction)
     return obstacle_predictions
 
